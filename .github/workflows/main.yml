@@ -49,6 +49,7 @@ jobs:
           switches: -avzr --delete
           path: ./
           remote_path: /var/www/nodeapplication/
-          remote_host: ${{ secrets.EC2_HOST }}
+          remote_host: 54.169.34.91
           remote_user: ubuntu
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
