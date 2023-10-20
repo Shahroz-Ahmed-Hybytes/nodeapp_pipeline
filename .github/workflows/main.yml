@@ -58,4 +58,4 @@ jobs:
         run: sudo service nginx restart
 
       - name: Restart PM2
-        run: pm2 restart all  
+        run: pm2 restart app.js  
