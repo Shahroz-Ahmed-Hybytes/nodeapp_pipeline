@@ -53,3 +53,9 @@ jobs:
           remote_user: ubuntu
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
+
+      - name: Restart Nginx
+        run: sudo service nginx restart
+
+      - name: Restart PM2
+        run: pm2 restart all  
