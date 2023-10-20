@@ -57,6 +57,3 @@ jobs:
       - name: Restart Nginx
         run: sudo service nginx restart
 
-      - name: Restart PM2
-        run: /usr/local/bin/pm2 restart /var/www/nodeapplication/app.js
-        working-directory: /var/www/nodeapplication
