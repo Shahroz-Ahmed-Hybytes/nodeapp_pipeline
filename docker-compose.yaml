@@ -1,0 +1,21 @@
+version: '3'
+services:
+  app:
+    image: your-nodejs-app-image
+    container_name: nodejs-app
+    ports:
+      - "3000:3000"
+    restart: always
+    working_dir: /app
+    environment:
+      NODE_ENV: production
+    command: pm2 start your-app.js --no-daemon
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
