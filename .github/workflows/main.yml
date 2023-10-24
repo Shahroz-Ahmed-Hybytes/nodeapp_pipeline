@@ -46,6 +46,7 @@ jobs:
     steps:
       - name: Set Permissions on SSH Private Key
         run: |
+          mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
 
