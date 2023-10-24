@@ -34,7 +34,7 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          docker build -t your-dockerhub-username/your-app-name:latest .
+          docker build -t shahroz43/nodeapplication:latest .
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker push shahroz43/nodeapplication
 
