@@ -52,8 +52,4 @@ deploy:
 
     - name: SSH into EC2 and Pull Docker Image
       run: |
-        ssh -i ~/.ssh/id_rsa ubuntu@54.169.34.91 << EOF
-          docker pull shahroz43/nodeapplication:latest
-          docker run -d -p 80:80 --name node_app shahroz43/nodeapplication:latest
-          sudo service nginx restart
-        EOF
+        ssh -i ~/.ssh/id_rsa -T ubuntu@54.169.34.91 "docker pull shahroz43/nodeapplication:latest && docker run -d -p 80:80 --name node_app shahroz43/nodeapplication:latest && sudo service nginx restart"
