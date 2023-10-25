@@ -2,7 +2,7 @@
 FROM node:14
 
 # Set the working directory inside the container
-WORKDIR /nodeapplication
+WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -13,7 +13,8 @@ RUN npm install
 # Copy the rest of your application code to the container
 COPY . .
 
-# Expose a port (if your application listens on a specific port)
+# Expose the port your application listens on (if necessary)
+# Replace with the actual port your Node.js app listens on
 EXPOSE 3000
 
 # Define the command to start your Node.js application
