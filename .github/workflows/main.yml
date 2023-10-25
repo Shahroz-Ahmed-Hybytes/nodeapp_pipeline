@@ -36,7 +36,7 @@ jobs:
         run: |
           docker build -t shahroz43/nodeapplication:latest .
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker push shahroz43/nodeapplication
+          docker push shahroz43/nodeapplication:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,17 +44,16 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Set Permissions on SSH Private Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 400 ~/.ssh/id_rsa
-
       - name: Deploy to EC2
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@54.169.34.91 'docker pull shahroz43/nodeapplication:latest'
-          ssh -i ~/.ssh/id_rsa ubuntu@54.169.34.91 'docker run -d -p 80:80 --name node_app shahroz43/nodeapplication:latest'
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete
+          path: ./
+          remote_path: /var/www/nodeapplication/
+          remote_host: 13.213.34.140
+          remote_user: root
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
 
       - name: Restart Nginx
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@54.169.34.91 'sudo service nginx restart'
+        run: sudo service nginx restart
