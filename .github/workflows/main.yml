@@ -70,4 +70,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker rm nodeapplication || true'
       - name: Run new container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker run -d --name nodeapplication -p 3000:3000 shahroz43/nodeapplication:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker run -d --name nodeapplication -p 3001:3001 shahroz43/nodeapplication:latest'
