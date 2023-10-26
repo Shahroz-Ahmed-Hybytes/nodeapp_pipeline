@@ -46,8 +46,8 @@ jobs:
           password: ${{ env.DOCKERHUB_PASSWORD }}
       - name: Set permissions for private key
         run: |
-          echo "${{ env.SSH_PRIVATE_KEY }}" > key.pem
-          chmod 600 key.pem
+          echo -n "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+          chmod 400 key.pem
       - name: Pull Docker image
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker pull shahroz43/nodeapplication:latest'
