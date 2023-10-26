@@ -48,11 +48,11 @@ jobs:
           chmod 600 key.pem
       - name: Pull Docker image
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-52-221-188-194 'sudo docker pull shahroz43/nodeapplication:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-143-181-164 'sudo docker pull shahroz43/nodeapplication:latest'
       - name: Stop running container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-52-221-188-194 'sudo docker stop nodeapplication || true'
-          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-52-221-188-194 'sudo docker rm nodeapplication || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-143-181-164 'sudo docker stop nodeapplication || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-143-181-164 'sudo docker rm nodeapplication || true'
       - name: Run new container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-52-221-188-194 'sudo docker run -d --name nodeapplication -p 3000:3000 shahroz43/nodeapplication:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-143-181-1644 'sudo docker run -d --name nodeapplication -p 3000:3000 shahroz43/nodeapplication:latest'
