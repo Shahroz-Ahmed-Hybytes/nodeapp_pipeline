@@ -66,7 +66,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker pull shahroz43/nodeapplication:latest'
       - name: Stop running container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} uubuntu@${{ secrets.EC2_HOST }} 'sudo docker stop nodeapplication || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker stop nodeapplication || true'
           ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker rm nodeapplication || true'
       - name: Run new container
         run: |
