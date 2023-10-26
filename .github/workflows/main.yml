@@ -48,6 +48,19 @@ jobs:
         run: |
           echo -n "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
           chmod 400 key.pem
+
+      - name: Convert Key Format
+        run: |
+          # Check if the key is in PEM format
+          if openssl rsa -check -noout -in key.pem; then
+            echo "Key is already in PEM format"
+          else
+            # Convert the key to PEM format using ssh-keygen
+            ssh-keygen -p -m PEM -f key.pem
+            echo "Key converted to PEM format"
+          fi
+
+
       - name: Pull Docker image
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker pull shahroz43/nodeapplication:latest'
