@@ -31,7 +31,7 @@ jobs:
           context: ./
           push: true
           dockerfile: ./Dockerfile
-          tags: shahroz43/nodeapplication:latest    
+          tags: shahroz43/nodeapp:latest    
 
   deploy:
     needs: build
@@ -63,11 +63,11 @@ jobs:
 
       - name: Pull Docker image
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker pull shahroz43/nodeapplication:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker pull shahroz43/nodeapp:latest'
       - name: Stop running container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker stop nodeapplication || true'
-          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker rm nodeapplication || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker stop nodeapp || true'
+          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker rm nodeapp || true'
       - name: Run new container
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker run -d --name nodeapplication -p 3001:3001 shahroz43/nodeapplication:latest'
+          ssh -o StrictHostKeyChecking=no -i key.pem -p ${{ secrets.SSH_PORT }} ubuntu@${{ secrets.EC2_HOST }} 'sudo docker run -d --name nodeapp -p 3001:3001 shahroz43/nodeapp:latest'

@@ -2,8 +2,8 @@ version: '3'
 
 services:
   app:
-    image: shahroz43/nodeapplication:latest
-    container_name: nodeapplication
+    image: shahroz43/nodeapp:latest
+    container_name: nodeapp
     restart: always
     ports:
       - "3001:3001"
