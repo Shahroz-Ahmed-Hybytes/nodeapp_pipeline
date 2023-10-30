@@ -64,3 +64,5 @@ WORKDIR /root/
 COPY --from=builder /app ./
 
 CMD ["node", "app.js"]
+
+#Finalized Application
