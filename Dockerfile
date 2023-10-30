@@ -20,7 +20,7 @@ WORKDIR /app
 
 # Copy only the necessary artifacts from the build stage to the final stage
 COPY --from=build /app/package*.json /app/
-COPY --from=build /app/dist /app/dist
+COPY --from=build ./dist ./dist
 
 # Install production dependencies (no devDependencies)
 RUN npm install --only=production
