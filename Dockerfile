@@ -19,7 +19,7 @@ FROM node:14
 WORKDIR /app
 
 # Copy only the necessary artifacts from the build stage to the final stage
-COPY --from=build /path/to/generated/dist ./dist
+COPY --from=build ./dist
 
 # Install production dependencies (no devDependencies)
 RUN npm install --only=production
