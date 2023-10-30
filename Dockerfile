@@ -23,41 +23,44 @@
 #END
 #Start new
 
+# Development Stage
 FROM node:16 as development
 
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files over
-# We do this FIRST so that we don't copy the huge node_modules folder over from our local machine
-# The node_modules can contain machine-specific libraries, so it should be created by the machine that's actually running the code
+# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Now we run NPM install, which includes dev dependencies
+# Install application dependencies, including dev dependencies
 RUN npm install
 
-# Copy the rest of our source code over to the image
+# Copy the rest of your source code to the image
 COPY . .
 
 EXPOSE 3001
 
-# Run our start:dev command, which uses nodemon to watch for changes
-CMD [ "npm", "run", "start:dev" ]
+# Run the start:dev command, which uses nodemon to watch for changes
+CMD ["npm", "run", "start:dev"]
 
-# "Builder" stage extends from the "development" stage but does an NPM clean install with only production dependencies 
+# Builder Stage
 FROM development as builder
-WORKDIR /usr/src/app
+
+WORKDIR /app
 
 # Remove the development dependencies but keep the production ones
 RUN rm -rf node_modules
 RUN npm ci --only=production
 
 EXPOSE 3001
-#START APPLICATION
-CMD [ "npm", "start" ]
- 
-# Final stage uses a very small image and copies the built assets across from the "builder" stage
+
+# Final Production Stage
 FROM alpine:latest as production
+
 RUN apk --no-cache add nodejs ca-certificates
+
 WORKDIR /root/
+
+# Copy the built assets from the "builder" stage
 COPY --from=builder /app ./
-CMD [ "node", "app.js" ]
+
+CMD ["node", "app.js"]
