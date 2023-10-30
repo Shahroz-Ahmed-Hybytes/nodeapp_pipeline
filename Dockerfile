@@ -25,7 +25,7 @@
 
 FROM node:16 as development
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy the package.json and package-lock.json files over
 # We do this FIRST so that we don't copy the huge node_modules folder over from our local machine
@@ -36,7 +36,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of our source code over to the image
-COPY ./src ./src
+COPY . .
 
 EXPOSE 3001
 
@@ -46,14 +46,18 @@ CMD [ "npm", "run", "start:dev" ]
 # "Builder" stage extends from the "development" stage but does an NPM clean install with only production dependencies 
 FROM development as builder
 WORKDIR /usr/src/app
+
+# Remove the development dependencies but keep the production ones
 RUN rm -rf node_modules
 RUN npm ci --only=production
+
 EXPOSE 3001
+#START APPLICATION
 CMD [ "npm", "start" ]
  
 # Final stage uses a very small image and copies the built assets across from the "builder" stage
 FROM alpine:latest as production
 RUN apk --no-cache add nodejs ca-certificates
 WORKDIR /root/
-COPY --from=builder /usr/src/app ./
+COPY --from=builder /app ./
 CMD [ "node", "app.js" ]
