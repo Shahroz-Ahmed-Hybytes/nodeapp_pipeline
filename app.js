@@ -1,88 +1,104 @@
-const express = require('express'),
-    bodyParser = require('body-parser'),
-    // In order to use PUT HTTP verb to edit item
-    methodOverride = require('method-override'),
-    // Mitigate XSS using sanitizer
-    sanitizer = require('sanitizer'),
-    app = express(),
-    port = 3001
+const promClient = require('prom-client');
+const express = require('express');
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+const sanitizer = require('sanitizer');
+const app = express();
+const port = 3001;
 
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
-// https: //github.com/expressjs/method-override#custom-logic
+// Create a Prometheus Registry to register and manage your metrics
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride(function (req, res) {
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-        // look in urlencoded POST bodies and delete it
         let method = req.body._method;
         delete req.body._method;
-        return method
+        return method;
     }
 }));
 
-
 let todolist = [];
 
-/* The to do list and the form are displayed */
+// Create a Prometheus counter metric for HTTP requests
+const httpRequestCounter = new promClient.Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+    labelNames: ['method', 'route'],
+    registers: [register], // Register this metric with the custom registry
+});
+
 app.get('/todo', function (req, res) {
-        res.render('todo.ejs', {
-            todolist,
+    // Increment the HTTP request counter for this route
+    httpRequestCounter.inc({ method: 'GET', route: '/todo' });
+
+    res.render('todo.ejs', {
+        todolist,
+        clickHandler: "func1();"
+    });
+})
+
+.post('/todo/add/', function (req, res) {
+    httpRequestCounter.inc({ method: 'POST', route: '/todo/add' });
+
+    let newTodo = sanitizer.escape(req.body.newtodo);
+    if (req.body.newtodo != '') {
+        todolist.push(newTodo);
+    }
+    res.redirect('/todo');
+})
+
+.get('/todo/delete/:id', function (req, res) {
+    httpRequestCounter.inc({ method: 'GET', route: '/todo/delete' });
+
+    if (req.params.id != '') {
+        todolist.splice(req.params.id, 1);
+    }
+    res.redirect('/todo');
+})
+
+.get('/todo/:id', function (req, res) {
+    httpRequestCounter.inc({ method: 'GET', route: '/todo/:id' });
+
+    let todoIdx = req.params.id;
+    let todo = todolist[todoIdx];
+
+    if (todo) {
+        res.render('edititem.ejs', {
+            todoIdx,
+            todo,
             clickHandler: "func1();"
         });
-    })
-
-    /* Adding an item to the to do list */
-    .post('/todo/add/', function (req, res) {
-        // Escapes HTML special characters in attribute values as HTML entities
-        let newTodo = sanitizer.escape(req.body.newtodo);
-        if (req.body.newtodo != '') {
-            todolist.push(newTodo);
-        }
+    } else {
         res.redirect('/todo');
-    })
+    }
+})
 
-    /* Deletes an item from the to do list */
-    .get('/todo/delete/:id', function (req, res) {
-        if (req.params.id != '') {
-            todolist.splice(req.params.id, 1);
-        }
-        res.redirect('/todo');
-    })
+.put('/todo/edit/:id', function (req, res) {
+    httpRequestCounter.inc({ method: 'PUT', route: '/todo/edit' });
 
-    // Get a single todo item and render edit page
-    .get('/todo/:id', function (req, res) {
-        let todoIdx = req.params.id;
-        let todo = todolist[todoIdx];
+    let todoIdx = req.params.id;
+    let editTodo = sanitizer.escape(req.body.editTodo);
+    if (todoIdx != '' && editTodo != '') {
+        todolist[todoIdx] = editTodo;
+    }
+    res.redirect('/todo');
+})
 
-        if (todo) {
-            res.render('edititem.ejs', {
-                todoIdx,
-                todo,
-                clickHandler: "func1();"
-            });
-        } else {
-            res.redirect('/todo');
-        }
-    })
+.use(function (req, res, next) {
+    httpRequestCounter.inc({ method: 'UNKNOWN', route: 'unknown' });
+    res.redirect('/todo');
+})
 
-    // Edit item in the todo list 
-    .put('/todo/edit/:id', function (req, res) {
-        let todoIdx = req.params.id;
-        // Escapes HTML special characters in attribute values as HTML entities
-        let editTodo = sanitizer.escape(req.body.editTodo);
-        if (todoIdx != '' && editTodo != '') {
-            todolist[todoIdx] = editTodo;
-        }
-        res.redirect('/todo');
-    })
-    /* Redirects to the to do list if the page requested is not found */
-    .use(function (req, res, next) {
-        res.redirect('/todo');
-    })
+.listen(port, function () {
+    console.log(`Todolist running on http://127.0.0.1:${port}`);
+});
 
-    .listen(port, function () {
-        // Logging to console
-        console.log(`Todolist running on http://127.0.0.1:${port}`)
-    });
-// Export app
+// Add a new endpoint to expose Prometheus metrics
+app.get('/metrics', (req, res) => {
+    res.set('Content-Type', register.contentType);
+    res.end(register.metrics());
+});
+
 module.exports = app;
